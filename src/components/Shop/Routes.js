@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import ProductItem from "./ProductItem"
 import classes from "./Routes.module.css"
 import { DUMMY_ROUTES } from "../../dummy"
