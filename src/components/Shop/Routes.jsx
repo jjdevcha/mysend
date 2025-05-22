@@ -1,18 +1,39 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import ProductItem from "./ProductItem"
 import classes from "./Routes.module.css"
-import { DUMMY_ROUTES } from "../../dummy"
 import { useSelector } from "react-redux"
 import TextField from "@mui/material/TextField"
 import Autocomplete from "@mui/material/Autocomplete"
+import { createClient } from "@supabase/supabase-js"
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+)
 
 const Routes = (props) => {
+  const [routes, setRoutes] = useState([])
+
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        const { data, error } = await supabase.from("comp_set").select()
+        if (error) {
+          throw new Error(error.message)
+        }
+        if (data) {
+          setRoutes(data)
+        }
+      } catch (error) {
+        console.error("Error fetching routes:", error)
+      }
+    }
+    fetchRoutes()
+  }, [])
   const { items } = useSelector((state) => state.sendList)
   const itemIds = items.map((item) => item.id)
 
-  const sortedRoutes = [...DUMMY_ROUTES].filter(
-    (route) => !itemIds.includes(route.id)
-  )
+  const sortedRoutes = routes.filter((route) => !itemIds.includes(route.id))
   const [searchValue, setSearchValue] = useState(undefined)
   const searchRoutes = sortedRoutes.filter(
     (route) => route.number === Number(searchValue)
